@@ -631,9 +631,6 @@ This specification is designed to be backward compatible with the existing `Item
 Potential future additions to this specification:
 - Additional content formats
 - Metadata fields (timestamps, author, etc.)
-- Access control information
-- Versioning support for items
-- Custom validation rules
 
 ## Appendix A: Type Definitions
 
