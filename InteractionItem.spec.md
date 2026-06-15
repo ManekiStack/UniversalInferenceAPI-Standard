@@ -124,7 +124,8 @@ interface InteractionItem {
 | `video` | Video data | video/mp4, video/webm, video/quicktime |
 | `audio` | Audio data | audio/wav, audio/mpeg, audio/ogg |
 | `file` | Generic file data | application/octet-stream, application/* |
-| `document` | Structured document data | application/pdf, application/json, text/csv |
+| `document` | Structured document data | application/pdf|
+| `vector` | Vector | |
 
 **Validation Rules:**
 - Must be one of the allowed values
