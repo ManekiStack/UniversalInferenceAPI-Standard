@@ -15,11 +15,13 @@ The `InteractionItem` specification defines a standardized structure for represe
 interface InteractionItem {
     // Required fields
     type: InteractionItemType;
-    key: string;
     format: ContentFormat;
     
-    // Optional fields (mutually exclusive content fields)
+    // Optional fields
+    key?: string;
     mime?: string;
+    
+    // Optional content fields (mutually exclusive)
     text?: string;
     data?: string;
     url?: string;
@@ -46,12 +48,12 @@ interface InteractionItem {
 | `tool_result` | Result from a tool execution | Function responses, API results |
 | `tool_error` | Error from a tool execution | Failed function calls |
 | `tool_definition` | Definition of available tools | Function schemas, tool descriptions |
-| `reference` | Reference to another item | Cross-references, dependencies |
 
 **Validation Rules:**
 - Must be one of the allowed values
 - Case-sensitive
 - Required for all InteractionItems
+- Note: `reference` type has been removed; use the `reference` content field for provider-side stored items
 
 **Examples:**
 ```json
@@ -66,7 +68,7 @@ interface InteractionItem {
 }
 ```
 
-#### 2. `key` (Required)
+#### 2. `key` (Optional)
 
 **Type:** `string`
 **Description:** Unique identifier for the item, supporting prefix-based naming.
@@ -81,11 +83,12 @@ interface InteractionItem {
 - Custom prefixes are allowed but should follow the `<prefix>/<name>` pattern
 
 **Validation Rules:**
-- Must be a non-empty string
+- If present, must be a non-empty string
 - Maximum length: 256 characters
 - Allowed characters: alphanumeric, underscore, hyphen, forward slash, dot
 - Must not start or end with a forward slash
 - Forward slashes are only allowed as prefix separators
+- When used, should be unique within the interaction context
 
 **Examples:**
 ```json
@@ -271,32 +274,43 @@ This ensures that each InteractionItem has exactly one source of content.
 ##### 5.4 `reference` (Optional)
 
 **Type:** `string`
-**Description:** Reference pointer to another InteractionItem.
-**Use Case:** Cross-references, dependencies, linking items
+**Description:** Reference pointer to a stored item, which can be either provider-side (e.g., knowledge base item, document, or resource) or local client-side.
+**Use Case:** Referencing provider-managed content, knowledge base entries, external resources, or local client-side items
 
-**Format:** `ref:<key>` or `<key>`
+**Format:** 
+- Provider-side: Provider-specific reference string (e.g., `kb:<id>`, `doc:<id>`, or custom provider format)
+- Client-side: Local reference identifier (e.g., `local:<id>`, `client:<id>`, or custom client format)
 
 **Validation Rules:**
-- Must reference an existing InteractionItem key
+- Must reference an existing stored item (provider-side or client-side)
 - Maximum length: 256 characters
+- Format and validation rules depend on the reference type
 - Must not create circular references
 
 **Examples:**
 ```json
 {
-  "type": "reference",
-  "key": "ref/user/query_1",
+  "type": "input",
+  "key": "user/knowledge_ref",
   "format": "text",
-  "reference": "user/query_1"
+  "reference": "kb:article_12345"
 }
 ```
 
 ```json
 {
-  "type": "reference",
-  "key": "ref/tool_result_1",
-  "format": "json",
-  "reference": "ref:tool/weather_call_1"
+  "type": "input",
+  "key": "user/document_ref",
+  "format": "document",
+  "reference": "doc:manual_v2.1"
+}
+```
+
+```json
+{
+  "type": "input",
+  "format": "text",
+  "reference": "local:client_item_42"
 }
 ```
 
@@ -466,14 +480,14 @@ This ensures that each InteractionItem has exactly one source of content.
 }
 ```
 
-### Example 7: Reference Item
+### Example 7: Knowledge Base Reference
 
 ```json
 {
-  "type": "reference",
-  "key": "ref/previous_response",
+  "type": "input",
+  "key": "user/knowledge_query",
   "format": "text",
-  "reference": "agent/response_1"
+  "reference": "kb:faq_ai_concepts"
 }
 ```
 
@@ -520,8 +534,10 @@ This ensures that each InteractionItem has exactly one source of content.
 
 ### 1. Required Fields
 - `type` - Must be present and valid
-- `key` - Must be present and valid
 - `format` - Must be present and valid
+
+### 2. Optional Fields
+- `key` - Optional unique identifier
 
 ### 2. Content Field Exclusivity
 - Exactly ONE of the following must be present:
@@ -564,7 +580,7 @@ This ensures that each InteractionItem has exactly one source of content.
 | `INCOMPATIBLE_FORMAT` | Content field incompatible with format | 400 Bad Request |
 | `INVALID_MIME` | MIME type incompatible with format | 400 Bad Request |
 | `INVALID_URL` | Invalid URL format | 400 Bad Request |
-| `INVALID_REFERENCE` | Reference points to non-existent key | 400 Bad Request |
+| `INVALID_REFERENCE` | Reference points to non-existent provider-side item | 400 Bad Request |
 | `INVALID_OBJECT_ID` | Object ID does not exist | 404 Not Found |
 | `CIRCULAR_REFERENCE` | Circular reference detected | 400 Bad Request |
 
@@ -645,8 +661,7 @@ type InteractionItemType =
     | 'tool_call'
     | 'tool_result'
     | 'tool_error'
-    | 'tool_definition'
-    | 'reference';
+    | 'tool_definition';
 
 type ContentFormat = 
     | 'text'
@@ -665,13 +680,13 @@ type ContentFormat =
   "title": "InteractionItem",
   "version": "1.0.0-beta.0",
   "type": "object",
-  "required": ["type", "key", "format"],
+  "required": ["type", "format"],
   "properties": {
     "type": {
       "type": "string",
       "enum": [
         "developer", "input", "output", "tool_call", 
-        "tool_result", "tool_error", "tool_definition", "reference"
+        "tool_result", "tool_error", "tool_definition"
       ]
     },
     "key": {
