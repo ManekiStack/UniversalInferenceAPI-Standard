@@ -165,7 +165,7 @@ interface InteractionItem {
 | `video` | video/* |
 | `audio` | audio/* |
 | `file` | application/octet-stream, application/* |
-| `document` | application/pdf, application/json, text/csv, text/xml, application/msword, application/vnd.* |
+| `document` | application/pdf, application/msword |
 
 **Examples:**
 ```json
