@@ -46,8 +46,6 @@ interface InteractionItem {
 | `tool_result` | Result from a tool execution | Function responses, API results |
 | `tool_error` | Error from a tool execution | Failed function calls |
 | `tool_definition` | Definition of available tools | Function schemas, tool descriptions |
-| `reference` | Reference to another item | Cross-references, dependencies |
-
 **Validation Rules:**
 - Must be one of the allowed values
 - Case-sensitive
