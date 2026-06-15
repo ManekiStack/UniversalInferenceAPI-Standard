@@ -593,7 +593,7 @@ This ensures that each InteractionItem has exactly one source of content.
 - Use `data` for small binary content (base64 encoded)
 - Use `url` for large files or external resources
 - Use `objectId` for files uploaded via the Objects API
-- Use `reference` to link to other InteractionItems
+- Use `reference` to link to content outside interactions.
 - Use `json` for structured data
 
 ### 3. Format Selection
