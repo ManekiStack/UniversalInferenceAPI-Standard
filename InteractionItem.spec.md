@@ -670,7 +670,7 @@ type ContentFormat =
       "type": "string",
       "enum": [
         "developer", "input", "output", "tool_call", 
-        "tool_result", "tool_error", "tool_definition", "reference"
+        "tool_result", "tool_error", "tool_definition"
       ]
     },
     "key": {
