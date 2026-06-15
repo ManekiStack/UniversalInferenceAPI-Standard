@@ -15,10 +15,10 @@ The `InteractionItem` specification defines a standardized structure for represe
 interface InteractionItem {
     // Required fields
     type: InteractionItemType;
-    key: string;
     format: ContentFormat;
     
     // Optional fields (mutually exclusive content fields)
+    key: string;
     mime?: string;
     text?: string;
     data?: string;
@@ -66,7 +66,7 @@ interface InteractionItem {
 }
 ```
 
-#### 2. `key` (Required)
+#### 2. `key` (Optional)
 
 **Type:** `string`
 **Description:** Unique identifier for the item, supporting prefix-based naming.
